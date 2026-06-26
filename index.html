@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAS Accident/Incident Information</title>
+    <title>HND Accident/Incident Information</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 1.5vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
@@ -30,7 +30,7 @@
     <div class="header">
         <img src="bg-logo.png" alt="Logo">
         <div class="header-text">
-            <h1>KAS Accident/Incident Information</h1>
+            <h1>HND Accident/Incident Information</h1>
             <div class="company-name">KANSAI AIRPORTS<br>Aviation Services</div>
         </div>
     </div>
@@ -52,8 +52,8 @@
     </div>
 
     <script>
-        // KAS用のCSV出力URL
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRju7RHJ7_5PMGhXmQhcnCs5S6YiAwLY-mVASp8wbhF7l0oCj2PyRN51IAOdoJQGboNAOZiIhNI4mKh/pub?output=csv';
+        // HND支店用URL（CSV形式に変換）
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRju7RHJ7_5PMGhXmQhcnCs5S6YiAwLY-mVASp8wbhF7l0oCj2PyRN51IAOdoJQGboNAOZiIhNI4mKh/pub?gid=2118289952&single=true&output=csv';
         let myChart = null;
 
         async function loadData() {
@@ -64,15 +64,18 @@
                 
                 const tableSection = document.getElementById('table-section');
                 tableSection.innerHTML = '';
+                
                 const createTable = (h, r) => {
                     const t = document.createElement('table');
-                    t.innerHTML = `<thead><tr>${h.map(i=>`<th>${i}</th>`).join('')}</tr></thead><tbody>${r.map(row=>`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+                    // HND専用に見出しを変換
+                    const modifiedHeaders = h.map(item => item.replace(/KIX\/UKB|KIX/g, "HND"));
+                    t.innerHTML = `<thead><tr>${modifiedHeaders.map(i=>`<th>${i}</th>`).join('')}</tr></thead><tbody>${r.map(row=>`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
                     tableSection.appendChild(t);
                 };
-                if(data[1]) createTable(data[1].slice(0,3), [data[2].slice(0,3)]);
-                if(data[4]) createTable(data[4].slice(0,4), [data[5].slice(0,4)]);
                 
-                // 表からはA16, A17を除外
+                if(data[1]) createTable(data[1].slice(0,3), [data[2].slice(0,3)]);
+                if(data[4]) createTable(data[4].slice(0,4), [data[5].slice(0,3)]); // HND列まで取得
+                
                 if(data[7]) {
                     const kpiRows = data.slice(8).filter(r => 
                         r[0] && 
@@ -82,7 +85,6 @@
                     createTable(data[7].slice(0,3), kpiRows);
                 }
 
-                // 数字取得（表には表示させず、グラフ用として読み込む）
                 const goal = parseInt(data[15][1]);
                 const cur = parseInt(data[16][1]);
                 document.getElementById('goal-days-display').textContent = goal;
