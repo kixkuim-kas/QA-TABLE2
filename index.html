@@ -11,6 +11,7 @@
         .header img { height: 8vh; margin-right: 1.5vw; }
         .header-text { line-height: 1.2; }
         .header h1 { font-size: 3.2vh; color: #002f6c; margin: 0; }
+        /* 社名をKASに固定 */
         .company-name { font-size: 2vh; color: #002f6c; font-weight: bold; }
         .main-container { height: 82vh; display: flex; justify-content: space-between; align-items: flex-start; gap: 2vw; }
         .table-section { width: 50%; height: 100%; overflow-y: auto; }
@@ -31,7 +32,7 @@
         <img src="bg-logo.png" alt="Logo">
         <div class="header-text">
             <h1>HND Accident/Incident Information</h1>
-            <div class="company-name">KANSAI AIRPORTS<br>Aviation Services</div>
+            <div class="company-name">KAS<br>KANSAI AIRPORTS Aviation Services</div>
         </div>
     </div>
 
@@ -52,7 +53,6 @@
     </div>
 
     <script>
-        // HND支店用URL（CSV形式に変換）
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRju7RHJ7_5PMGhXmQhcnCs5S6YiAwLY-mVASp8wbhF7l0oCj2PyRN51IAOdoJQGboNAOZiIhNI4mKh/pub?gid=2118289952&single=true&output=csv';
         let myChart = null;
 
@@ -67,14 +67,13 @@
                 
                 const createTable = (h, r) => {
                     const t = document.createElement('table');
-                    // HND専用に見出しを変換
-                    const modifiedHeaders = h.map(item => item.replace(/KIX\/UKB|KIX/g, "HND"));
-                    t.innerHTML = `<thead><tr>${modifiedHeaders.map(i=>`<th>${i}</th>`).join('')}</tr></thead><tbody>${r.map(row=>`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+                    // 見出しの置換を抑え、そのまま表示するようにしました
+                    t.innerHTML = `<thead><tr>${h.map(i=>`<th>${i}</th>`).join('')}</tr></thead><tbody>${r.map(row=>`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
                     tableSection.appendChild(t);
                 };
                 
                 if(data[1]) createTable(data[1].slice(0,3), [data[2].slice(0,3)]);
-                if(data[4]) createTable(data[4].slice(0,4), [data[5].slice(0,3)]); // HND列まで取得
+                if(data[4]) createTable(data[4].slice(0,4), [data[5].slice(0,3)]);
                 
                 if(data[7]) {
                     const kpiRows = data.slice(8).filter(r => 
