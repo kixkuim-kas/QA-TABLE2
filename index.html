@@ -79,9 +79,12 @@
                     tableSection.appendChild(t);
                 };
                 
+                // 1つ目のテーブルを表示
                 if(data[1]) createTable(data[1].slice(0,3), [data[2].slice(0,3)]);
-                if(data[4]) createTable(data[4].slice(0,4), [data[5].slice(0,4)]);
                 
+                // 【変更点】HNDのコードからも、A5:D6のテーブルを表示する記述（if(data[4])...）を削除しました。
+                
+                // 3つ目のテーブル（Safety KPI 安全成績指標）を表示
                 if(data[7]) {
                     const kpiRows = data.slice(8).filter(r => 
                         r[0] && r[0] !== "制限区域内無事故日数目標" && r[0] !== "継続日数"
