@@ -6,26 +6,46 @@
     <title>HND Accident/Incident Information</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* スクロールバーを出さない設定は維持 */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 1.5vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+        
+        /* ヘッダーの高さは維持 (12vh) */
         .header { height: 12vh; display: flex; align-items: center; margin-bottom: 1vh; }
         .header img { height: 8vh; margin-right: 1.5vw; }
         .header-text { line-height: 1.2; }
         .header h1 { font-size: 3.2vh; color: #002f6c; margin: 0; }
         .company-name { font-size: 2vh; color: #002f6c; font-weight: bold; line-height: 1.3; }
-        .main-container { height: 82vh; display: flex; justify-content: space-between; align-items: flex-start; gap: 2vw; }
+        
+        /* 画像の高さを確保するため、メインコンテンツの高さを52vhに縮小 */
+        .main-container { height: 52vh; display: flex; justify-content: space-between; align-items: flex-start; gap: 2vw; margin-bottom: 2vh; }
         .table-section { width: 50%; height: 100%; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 1.6vh; margin-bottom: 2vh; }
         th, td { padding: 0.8vh; border-bottom: 1px solid #ddd; text-align: left; }
         th { background-color: #002f6c; color: white; }
         
-        .chart-section { width: 45%; height: 80vh; margin-top: -3vh; display: flex; justify-content: center; align-items: center; background-image: url('newlogo.jpg'); background-repeat: no-repeat; background-position: center; background-size: contain; opacity: 0.8; }
+        /* チャートエリアの高さをメインコンテンツに合わせる */
+        .chart-section { width: 45%; height: 100%; display: flex; justify-content: center; align-items: center; background-image: url('newlogo.jpg'); background-repeat: no-repeat; background-position: center; background-size: contain; opacity: 0.8; }
         .chart-container { width: 80%; aspect-ratio: 1 / 1; position: relative; background-color: rgba(255, 255, 255, 0.7); border-radius: 50%; }
         
-        /* テキストサイズを20%拡大したスタイル */
         .chart-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
-        .text-line1 { font-size: 2.64vh; color: #d32f2f; font-weight: bold; } /* 2.2vh -> 2.64vh */
-        .text-line2 { font-size: 8.4vh; color: #002f6c; font-weight: bold; line-height: 1; } /* 7vh -> 8.4vh */
-        .text-line3 { font-size: 3.0vh; color: #00bfff; font-weight: bold; } /* 2.5vh -> 3.0vh */
+        .text-line1 { font-size: 2.64vh; color: #d32f2f; font-weight: bold; }
+        .text-line2 { font-size: 8.4vh; color: #002f6c; font-weight: bold; line-height: 1; }
+        .text-line3 { font-size: 3.0vh; color: #00bfff; font-weight: bold; }
+
+        /* 画像を表示するエリアのスタイル */
+        .image-section {
+            height: 30vh; /* 残りの高さを使用 */
+            display: flex;
+            justify-content: flex-start; /* 左寄せ */
+            align-items: center;
+            gap: 2vw; /* 画像の隙間 */
+            display: none; /* 初期は非表示 */
+        }
+        .image-section img {
+            height: 100%; /* エリアの高さ一杯に広げる */
+            width: auto; /* 横幅は自動調整 */
+            object-fit: contain; /* 領域内に収める */
+        }
     </style>
 </head>
 <body>
@@ -40,21 +60,31 @@
 
     <div id="loading" style="font-size: 3vh; padding: 10vh;">読み込み中...</div>
 
-    <div class="main-container" id="main-container" style="display: none;">
-        <div class="table-section" id="table-section"></div>
-        <div class="chart-section">
-            <div class="chart-container">
-                <canvas id="doughnutChart"></canvas>
-                <div class="chart-text">
-                    <div class="text-line1">制限区域内 無事故日数目標</div>
-                    <div class="text-line2"><span id="goal-days-display">0</span>日</div>
-                    <div class="text-line3"><span id="current-days-display">0</span>日 継続中！</div>
+    <div id="content-wrap" style="display: none; flex: 1; display: flex; flex-direction: column;">
+        
+        <div class="main-container" id="main-container">
+            <div class="table-section" id="table-section"></div>
+            <div class="chart-section">
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                    <div class="chart-text">
+                        <div class="text-line1">制限区域内 無事故日数目標</div>
+                        <div class="text-line2"><span id="goal-days-display">0</span>日</div>
+                        <div class="text-line3"><span id="current-days-display">0</span>日 継続中！</div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="image-section" id="image-section">
+            <img src="safex1.jpg" alt="Safety Image 1">
+            <img src="safex2.jpg" alt="Safety Image 2">
+        </div>
+        
     </div>
 
     <script>
+        // HND支店専用のCSV URL (gid=2118289952)
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRju7RHJ7_5PMGhXmQhcnCs5S6YiAwLY-mVASp8wbhF7l0oCj2PyRN51IAOdoJQGboNAOZiIhNI4mKh/pub?gid=2118289952&single=true&output=csv';
 
         async function loadData() {
@@ -82,7 +112,7 @@
                 // 1つ目のテーブルを表示
                 if(data[1]) createTable(data[1].slice(0,3), [data[2].slice(0,3)]);
                 
-                // 【変更点】HNDのコードからも、A5:D6のテーブルを表示する記述（if(data[4])...）を削除しました。
+                // 2つ目のテーブル（各空港）の非表示は維持
                 
                 // 3つ目のテーブル（Safety KPI 安全成績指標）を表示
                 if(data[7]) {
@@ -99,8 +129,10 @@
                     options: { cutout: '80%', plugins: { legend: { display: false } } }
                 });
 
+                // 表示の切り替え
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('main-container').style.display = 'flex';
+                document.getElementById('content-wrap').style.display = 'flex';
+                document.getElementById('image-section').style.display = 'flex';
             } catch(e) { document.getElementById('loading').textContent = 'エラーが発生しました'; }
         }
         loadData();
