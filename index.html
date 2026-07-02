@@ -16,8 +16,8 @@
         .header h1 { font-size: 3.2vh; color: #002f6c; margin: 0; }
         .company-name { font-size: 2vh; color: #002f6c; font-weight: bold; line-height: 1.3; }
         
-        /* 画像の高さを確保するため、メインコンテンツの高さを52vhに縮小 */
-        .main-container { height: 52vh; display: flex; justify-content: space-between; align-items: flex-start; gap: 2vw; margin-bottom: 2vh; }
+        /* 【変更】画像を上に近づけるため、margin-bottomを 2vh から 0.5vh に縮小 */
+        .main-container { height: 52vh; display: flex; justify-content: space-between; align-items: flex-start; gap: 2vw; margin-bottom: 0.5vh; }
         .table-section { width: 50%; height: 100%; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 1.6vh; margin-bottom: 2vh; }
         th, td { padding: 0.8vh; border-bottom: 1px solid #ddd; text-align: left; }
@@ -27,23 +27,49 @@
         .chart-section { width: 45%; height: 100%; display: flex; justify-content: center; align-items: center; background-image: url('newlogo.jpg'); background-repeat: no-repeat; background-position: center; background-size: contain; opacity: 0.8; }
         .chart-container { width: 80%; aspect-ratio: 1 / 1; position: relative; background-color: rgba(255, 255, 255, 0.7); border-radius: 50%; }
         
-        .chart-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
-        .text-line1 { font-size: 2.64vh; color: #d32f2f; font-weight: bold; }
-        .text-line2 { font-size: 8.4vh; color: #002f6c; font-weight: bold; line-height: 1; }
-        .text-line3 { font-size: 3.0vh; color: #00bfff; font-weight: bold; }
+        /* 【変更】中央テキスト全体の配置調整 */
+        .chart-text { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            width: 90%; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        /* 制限区域内 無事故日数目標 */
+        .text-line1 { font-size: 3.0vh; color: #d32f2f; font-weight: bold; margin-bottom: 1.5vh; white-space: nowrap; } 
+        /* 〇〇日 */
+        .text-line2 { font-size: 9.5vh; color: #002f6c; font-weight: bold; line-height: 1.1; margin-bottom: 2.0vh; } 
+        
+        /* 【変更】〇〇日 継続中！（青背景に白文字の四角デザイン） */
+        .text-line3 { 
+            font-size: 4.2vh; 
+            color: #ffffff; 
+            background-color: #00bfff; 
+            font-weight: bold; 
+            white-space: nowrap; 
+            padding: 0.8vh 2.5vh; 
+            border-radius: 0.8vh; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
 
-        /* 画像を表示するエリアのスタイル */
+        /* 【変更】画像エリアの上部を少しマイナス方向に引っ張り、位置を上に上げました */
         .image-section {
-            height: 30vh; /* 残りの高さを使用 */
+            height: 32vh; /* 高さを少し広げて画像を大きく表示できるように調整 */
+            margin-top: -1.5vh; /* テーブルとチャートのエリアに少し近づける */
             display: flex;
             justify-content: flex-start; /* 左寄せ */
             align-items: center;
-            gap: 2vw; /* 画像の隙間 */
-            display: none; /* 初期は非表示 */
+            gap: 2vw; /* 画像間の隙間 */
+            display: none; /* 初期状態は非表示 */
         }
         .image-section img {
             height: 100%; /* エリアの高さ一杯に広げる */
-            width: auto; /* 横幅は自動調整 */
+            width: auto; /* 横幅は自動調整 (アスペクト比維持) */
             object-fit: contain; /* 領域内に収める */
         }
     </style>
@@ -84,7 +110,7 @@
     </div>
 
     <script>
-        // HND支店専用のCSV URL (gid=2118289952)
+        // HND支店専用のCSV URL (gid=2118289952) は変更していません
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRju7RHJ7_5PMGhXmQhcnCs5S6YiAwLY-mVASp8wbhF7l0oCj2PyRN51IAOdoJQGboNAOZiIhNI4mKh/pub?gid=2118289952&single=true&output=csv';
 
         async function loadData() {
